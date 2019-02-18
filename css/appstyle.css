@@ -1,0 +1,32 @@
+html, body
+{
+	background-color:white;
+	height: 98%;
+	width: 98%;
+}
+
+
+h3 {color:white;
+	height: 15%;
+	user-select: none;
+	text-align: center;
+}
+
+#bigdiv, body, html {
+	-webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+     touch-action: none;
+}
+
+#svg_area {
+	border: 1px solid #00f;
+	margin: auto;
+	background-color: LightGray;
+
+}
+
+
+
+
