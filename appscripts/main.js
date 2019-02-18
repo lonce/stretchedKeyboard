@@ -1,8 +1,8 @@
 
-import sndFactory from 'https://aisound.cloud/aiSounds/StretchedHarmonics.js'
-import polyWog from 'https://aisound.cloud/aisCore/polywog.js'
-//import sndFactory from 'http://localhost:8000/aiSounds/StretchedHarmonics.js'
-//import polyWog from 'http://localhost:8000/aisCore/polywog.js'
+//import sndFactory from 'https://aisound.cloud/aiSounds/StretchedHarmonics.js'
+//import polyWog from 'https://aisound.cloud/aisCore/polywog.js'
+import sndFactory from 'http://localhost:8000/aiSounds/StretchedHarmonics.js'
+import polyWog from 'http://localhost:8000/aisCore/polywog.js'
 
 import aiSlider from './aiSlider.js'
 
@@ -11,6 +11,7 @@ import aiSlider from './aiSlider.js'
 //var snd = sfactory(audioCtx);
 
 var snd;
+var ctx;
 var sliderDiv=document.createElement('div');  // append later, after drawing FM tree
 
 var lowNote=48;
@@ -22,7 +23,8 @@ var numWhiteKeys=15;
 //Polyphonic sound:
 polyWog(sndFactory,numKeys).then(function(newsnd) {
   snd=newsnd; // a polywog wrapper of many instances of the sound
-
+  ctx=newsnd.getContext();
+  
   let nstretchslider=aiSlider(snd, "Note Stretch")
   sliderDiv.appendChild(nstretchslider);
   sliderDiv.appendChild(document.createElement('br'));
@@ -212,7 +214,7 @@ var makeKeys=function(svgelmt){
       e.target.setAttributeNS(null, 'stoke-color', '#000000')
       e.target.setAttributeNS(null, 'stoke-width', '3px')
 
-      snd.release(0, e.target.snum);
+      snd.release(ctx.currentTime, e.target.snum);
       mouseDown=false;
     });
 
@@ -222,7 +224,7 @@ var makeKeys=function(svgelmt){
         e.target.setAttributeNS(null, 'stoke-color', '#000000')
         e.target.setAttributeNS(null, 'stoke-width', '3px')
 
-        snd.release(0, e.target.snum);
+        snd.release(ctx.currentTime, e.target.snum);
       }
     });
 
@@ -250,7 +252,7 @@ var makeKeys=function(svgelmt){
       e.target.setAttributeNS(null, 'stoke-color', '#000000')
       e.target.setAttributeNS(null, 'stoke-width', '3px')
 
-      snd.release(0, e.target.snum);
+      snd.release(ctx.currentTime, e.target.snum);
       
     }, false);
 
