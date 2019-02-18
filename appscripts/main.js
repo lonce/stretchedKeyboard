@@ -1,8 +1,8 @@
 
-//import sndFactory from 'https://aisound.cloud/aiSounds/StretchedHarmonics.js'
-//import polyWog from 'https://aisound.cloud/aisCore/polywog.js'
-import sndFactory from 'http://localhost:8000/aiSounds/StretchedHarmonics.js'
-import polyWog from 'http://localhost:8000/aisCore/polywog.js'
+import sndFactory from 'https://aisound.cloud/aiSounds/StretchedHarmonics.js'
+import polyWog from 'https://aisound.cloud/aisCore/polywog.js'
+//import sndFactory from 'http://localhost:8000/aiSounds/StretchedHarmonics.js'
+//import polyWog from 'http://localhost:8000/aisCore/polywog.js'
 
 import aiSlider from './aiSlider.js'
 
