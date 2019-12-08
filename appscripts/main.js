@@ -100,11 +100,33 @@ var k_keyHeight = parseFloat(svgelmt.getAttribute("height")*5/6);
 var k_whiteKeyWidth  = parseFloat(svgelmt.getAttribute("width")/numWhiteKeys);
 var k_blackKeyWidth = k_whiteKeyWidth*2/5;
 
+let key=[]
+let playKey=function(keynum){
+    console.log("play key " + keynum)
+    if (key[keynum].pressed) return;
+    key[keynum].pressed=true;
+    key[keynum].setAttributeNS(null, 'fill', "green"); 
+    key[keynum].setAttributeNS(null, 'stoke', '#00FF00')
+    key[keynum].setAttributeNS(null, 'stoke-width', "1px")
+
+    snd.setParam("Note Number", key[keynum].noteNum)
+    key[keynum].snum=snd.play()
+}
+
+let stopKey=function(keynum){
+    key[keynum].setAttributeNS(null, 'fill', key[keynum].keyColor); 
+    key[keynum].setAttributeNS(null, 'stoke-color', '#000000')
+    key[keynum].setAttributeNS(null, 'stoke-width', '3px')
+
+    snd.release(ctx.currentTime, key[keynum].snum);
+    key[keynum].pressed=false;
+}  
+
 
           //------------------------------------------
 var makeKeys=function(svgelmt){
   // first identify and assign note attributes
-  let key=[]
+
   var i=0
   for(i=0;i<numKeys;i++){
 
@@ -134,6 +156,10 @@ var makeKeys=function(svgelmt){
     key[i].setAttributeNS(null, 'ry', 8);
     key[i].setAttributeNS(null, 'id', key[i].noteNum); 
 
+    // so clicked target can access the key array
+    key[i].keyNum=i; 
+    key[i].pressed=false;
+
   }
 
   // draw the white keys
@@ -147,6 +173,19 @@ var makeKeys=function(svgelmt){
 
       //key[i].setAttributeNS(null, 'style', 'fill: white; stroke: black; stroke-width: 1px;' );
       svgelmt.appendChild(key[i]);
+
+      // We will provide lables for white keys for alphanumeric activation
+      key[i].textElmt=document.createElementNS(static_xmlns, 'text');
+      key[i].textElmt.setAttribute('text-anchor', "middle");
+      key[i].textElmt.setAttribute('x', loc+k_whiteKeyWidth/2);
+      key[i].textElmt.setAttribute('y', 12 );//k_keyHeight-24);
+      key[i].textElmt.setAttribute('fill', '#000');
+      key[i].textElmt.setAttribute('width', 500);
+      key[i].textElmt.style.fill = 'grey';
+      key[i].textElmt.style.fontFamily = 'Calibri';
+      key[i].textElmt.style.fontSize = '12';
+      
+      svgelmt.appendChild(key[i].textElmt);
 
       loc +=k_whiteKeyWidth;
     }
@@ -178,7 +217,8 @@ var makeKeys=function(svgelmt){
       }
     }
   }
-   
+
+
 
   // now add listeners to all keys
   for(i=0;i<numKeys; i++){
@@ -187,44 +227,24 @@ var makeKeys=function(svgelmt){
 
     key[i].addEventListener("mousedown",function(e){
       //msgBox.value += "mousedown noteNum " + e.target.noteNum + " \n"
-      e.target.setAttributeNS(null, 'fill', "green"); 
-      e.target.setAttributeNS(null, 'stoke', '#00FF00')
-      e.target.setAttributeNS(null, 'stoke-width', "1px")
-
-      snd.setParam("Note Number", e.target.noteNum)
-      e.target.snum=snd.play()
-      
+      playKey(e.target.keyNum);
       mouseDown=true;
     });
     key[i].addEventListener("mouseover",function(e){
       if (mouseDown){
-        e.target.setAttributeNS(null, 'fill', "green"); 
-        e.target.setAttributeNS(null, 'stoke', '#00FF00')
-        e.target.setAttributeNS(null, 'stoke-width', "1px")
-
-        snd.setParam("Note Number", e.target.noteNum)
-        e.target.snum=snd.play()        
-
+        playKey(e.target.keyNum);        
       }
     });
 
 
     key[i].addEventListener("mouseup",function(e){
-      e.target.setAttributeNS(null, 'fill', e.target.keyColor); 
-      e.target.setAttributeNS(null, 'stoke-color', '#000000')
-      e.target.setAttributeNS(null, 'stoke-width', '3px')
-
-      snd.release(ctx.currentTime, e.target.snum);
+      stopKey(e.target.keyNum);
       mouseDown=false;
     });
 
     key[i].addEventListener("mouseout",function(e){
       if (mouseDown){
-        e.target.setAttributeNS(null, 'fill', e.target.keyColor);
-        e.target.setAttributeNS(null, 'stoke-color', '#000000')
-        e.target.setAttributeNS(null, 'stoke-width', '3px')
-
-        snd.release(ctx.currentTime, e.target.snum);
+        stopKey(e.target.keyNum);
       }
     });
 
@@ -234,12 +254,7 @@ var makeKeys=function(svgelmt){
       e.preventDefault();
       e.stopImmediatePropagation();
       
-      e.target.setAttributeNS(null, 'fill', "green"); 
-      e.target.setAttributeNS(null, 'stoke', '#00FF00')
-      e.target.setAttributeNS(null, 'stoke-width', "1px")
-
-      snd.setParam("Note Number", e.target.noteNum);
-      e.target.snum=snd.play();
+      playKey(e.target.keyNum);
       
     }, false);
 
@@ -248,19 +263,64 @@ var makeKeys=function(svgelmt){
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      e.target.setAttributeNS(null, 'fill', e.target.keyColor); 
-      e.target.setAttributeNS(null, 'stoke-color', '#000000')
-      e.target.setAttributeNS(null, 'stoke-width', '3px')
-
-      snd.release(ctx.currentTime, e.target.snum);
+      stopKey(e.target.keyNum);
       
     }, false);
 
   } // for all keys
 }
+makeKeys(svgelmt);
+
+let keyMap=[];
+keyMap['w']=12;  key[keyMap['w']].textElmt.innerHTML = 'w';
+keyMap['e']=14;  key[keyMap['e']].textElmt.innerHTML = 'e';
+keyMap['r']=16;  key[keyMap['r']].textElmt.innerHTML = 'r';
+keyMap['t']=17;  key[keyMap['t']].textElmt.innerHTML = 't';
+keyMap['y']=19;  key[keyMap['y']].textElmt.innerHTML = 'y';
+keyMap['u']=21;  key[keyMap['u']].textElmt.innerHTML = 'u';
+keyMap['i']=23;  key[keyMap['i']].textElmt.innerHTML = 'i';
+keyMap['o']=24;  key[keyMap['o']].textElmt.innerHTML = 'o';
+
+keyMap['3']=13;
+keyMap['4']=15;
+keyMap['6']=18;
+keyMap['7']=20;
+keyMap['8']=22;
+
+keyMap['z']=0;  key[keyMap['z']].textElmt.innerHTML = 'z';
+keyMap['x']=2;  key[keyMap['x']].textElmt.innerHTML = 'x';
+keyMap['c']=4;  key[keyMap['c']].textElmt.innerHTML = 'c';
+keyMap['v']=5;  key[keyMap['v']].textElmt.innerHTML = 'v';
+keyMap['b']=7;  key[keyMap['b']].textElmt.innerHTML = 'b';
+keyMap['n']=9;  key[keyMap['n']].textElmt.innerHTML = 'n';
+keyMap['m']=11;  key[keyMap['m']].textElmt.innerHTML = 'm';
+keyMap[',']=12;  key[keyMap[',']].textElmt.innerHTML = ', w';
+
+keyMap['s']=1;
+keyMap['d']=3;
+keyMap['g']=6;
+keyMap['h']=8;
+keyMap['j']=10;
 
 
-makeKeys(svgelmt)
+window.addEventListener("keydown", event => {
+  console.log("keydown = " + event.key + "  maps to " + keyMap[event.key])
+  if (keyMap[event.key] != undefined) {
+    playKey(keyMap[event.key])
+    return;
+  }
+  // do something
+});
+
+window.addEventListener("keyup", event => {
+  console.log("keyup = " + event.key + "  maps to " + keyMap[event.key])
+  if (keyMap[event.key] != undefined) {
+    stopKey(keyMap[event.key])
+    return;
+  }
+  // do something
+});
+
 
 bg.appendChild(sliderDiv)
 //++++++++++++++++++++++++++++++++++++++++++++++++++
